@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>考研错题本 - 自动编号版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            opacity: 0.95;
+            font-size: 16px;
+            font-weight: 400;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .intro {
+            background: linear-gradient(135deg, #f0f7ff 0%, #e8f4ff 100%);
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .intro h3 {
+            color: #667eea;
+            margin-bottom: 12px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .intro ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .intro li {
+            padding: 8px 0;
+            color: #555;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .intro li::before {
+            content: '✓ ';
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .text-area-wrapper {
+            position: relative;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 400px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            font-size: 15px;
+            line-height: 1.8;
+            resize: vertical;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+        
+        .char-count {
+            text-align: right;
+            color: #999;
+            font-size: 13px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .push-btn {
+            padding: 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .push-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .push-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .push-btn span {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .btn-math {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .btn-math:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(240, 147, 251, 0.4);
+        }
+        
+        .btn-ds {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        
+        .btn-ds:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(79, 172, 254, 0.4);
+        }
+        
+        .push-btn:disabled {
+            background: linear-gradient(135deg, #ccc 0%, #aaa 100%);
+            cursor: not-allowed;
+            transform: none;
+            opacity: 0.6;
+        }
+        
+        .push-btn:active:not(:disabled) {
+            transform: translateY(-1px);
+        }
+        
+        #status {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 15px;
+            display: none;
+            animation: slideIn 0.4s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 2px solid #bee5eb;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #fff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .shortcuts {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe9a6 100%);
+            border: 1px solid #ffeeba;
+            border-radius: 10px;
+            padding: 18px;
+            margin-top: 25px;
+            font-size: 13px;
+            color: #856404;
+        }
+        
+        .shortcuts strong {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+        
+        .shortcuts code {
+            background: #fff;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            font-weight: 600;
+            border: 1px solid #ffeeba;
+        }
+        
+        .file-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .file-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #dee2e6;
+            transition: all 0.3s;
+        }
+        
+        .file-card:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .file-card h4 {
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 17px;
+            font-weight: 600;
+        }
+        
+        .file-card .filename {
+            font-family: 'Consolas', monospace;
+            color: #667eea;
+            font-size: 13px;
+            margin-bottom: 18px;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .file-card .stats {
+            display: flex;
+            justify-content: space-around;
+            padding-top: 18px;
+            border-top: 2px solid #dee2e6;
+        }
+        
+        .file-card .stat-item {
+            text-align: center;
+        }
+        
+        .file-card .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .file-card .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        .refresh-btn {
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        
+        .refresh-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.02);
+        }
+        
+        .refresh-btn:active {
+            transform: scale(0.98);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 28px;
+            }
+            
+            .file-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+            
+            textarea {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 考研错题本</h1>
+            <p>自动编号 · 精确时间 · 智能追踪 · 一键推送</p>
+        </div>
+
+        <div class="content">
+            <div class="intro">
+                <h3>🎯 功能特点</h3>
+                <ul>
+                    <li>直接粘贴错题内容,系统自动分配连续题号</li>
+                    <li>每道题都有唯一编号（#1, #2, #3...）和精确时间戳</li>
+                    <li>实时显示各科目题目数量和下一题号</li>
+                    <li>支持 Markdown 格式、数学公式、代码块</li>
+                    <li>快捷键操作，提升录入效率</li>
+                </ul>
+            </div>
+
+            <div class="text-area-wrapper">
+                <textarea 
+                    id="content" 
+                    placeholder="📝 在这里粘贴你的错题内容...
+
+可以是任意格式：
+
+# 题目
+求极限 lim(x→0) sin(x)/x
+
+# 解析
+这是第一个重要极限，答案是 1
+
+$$\lim_{x \to 0} \frac{\sin x}{x} = 1$$
+
+# 笔记
+记住这个结论！
+
+---
+
+或者直接粘贴纯文本也可以！系统会自动添加题号和时间。"></textarea>
+            </div>
+            
+            <div class="char-count">
+                已输入 <span id="charCount">0</span> 字符
+            </div>
+
+            <div class="button-group">
+                <button class="push-btn btn-math" id="mathBtn">
+                    <span>📐 推送到数学错题本</span>
+                </button>
+                <button class="push-btn btn-ds" id="dsBtn">
+                    <span>💻 推送到数据结构错题本</span>
+                </button>
+            </div>
+
+            <div class="file-info">
+                <div class="file-card">
+                    <h4>📐 数学错题本</h4>
+                    <div class="filename">数学错题本.md</div>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-value" id="mathCount">-</span>
+                            <span class="stat-label">题目数量</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="mathNext">-</span>
+                            <span class="stat-label">下一题号</span>
+                        </div>
+                    </div>
+                    <button class="refresh-btn" onclick="loadStats('math')">🔄 刷新统计</button>
+                </div>
+                <div class="file-card">
+                    <h4>💻 数据结构错题本</h4>
+                    <div class="filename">数据结构错题本.md</div>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-value" id="dsCount">-</span>
+                            <span class="stat-label">题目数量</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="dsNext">-</span>
+                            <span class="stat-label">下一题号</span>
+                        </div>
+                    </div>
+                    <button class="refresh-btn" onclick="loadStats('ds')">🔄 刷新统计</button>
+                </div>
+            </div>
+
+            <div id="status"></div>
+
+            <div class="shortcuts">
+                <strong>⌨️ 快捷键指南</strong>
+                <code>Ctrl + 1</code> 推送到数学错题本 |
+                <code>Ctrl + 2</code> 推送到数据结构错题本 |
+                <code>Ctrl + K</code> 清空输入内容 |
+                <code>Ctrl + R</code> 刷新统计数据
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const contentInput = document.getElementById('content');
+        const mathBtn = document.getElementById('mathBtn');
+        const dsBtn = document.getElementById('dsBtn');
+        const statusDiv = document.getElementById('status');
+        const charCount = document.getElementById('charCount');
+
+        // 显示状态消息
+        function showStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = type;
+            statusDiv.style.display = 'block';
+        }
+
+        // 字符计数
+        contentInput.addEventListener('input', () => {
+            charCount.textContent = contentInput.value.length.toLocaleString();
+        });
+
+        // 加载统计信息
+        async function loadStats(subject) {
+            const countElem = document.getElementById(`${subject}Count`);
+            const nextElem = document.getElementById(`${subject}Next`);
+            
+            countElem.textContent = '...';
+            nextElem.textContent = '...';
+            
+            try {
+                const response = await fetch(`/api/stats/${subject}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const count = result.questionCount || 0;
+                    countElem.textContent = count;
+                    nextElem.textContent = `#${count + 1}`;
+                } else {
+                    countElem.textContent = '-';
+                    nextElem.textContent = '-';
+                }
+            } catch (error) {
+                console.error('加载统计失败:', error);
+                countElem.textContent = '-';
+                nextElem.textContent = '-';
+            }
+        }
+
+        // 推送函数
+        async function push(subject, buttonElement) {
+            const content = contentInput.value.trim();
+
+            if (!content) {
+                showStatus('⚠️ 请输入内容', 'error');
+                return;
+            }
+
+            const subjectName = subject === 'math' ? '数学' : '数据结构';
+            const originalHTML = buttonElement.innerHTML;
+            
+            buttonElement.disabled = true;
+            buttonElement.innerHTML = `<span>推送中<span class="loading"></span></span>`;
+            showStatus(`正在推送到${subjectName}错题本...`, 'info');
+
+            try {
+                const response = await fetch('/api/push', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content, subject })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showStatus(
+                        `✅ ${result.message}`,
+                        'success'
+                    );
+                    
+                    // 清空内容
+                    contentInput.value = '';
+                    charCount.textContent = '0';
+                    
+                    // 刷新统计
+                    await loadStats(subject);
+                    
+                    // 5秒后隐藏状态消息
+                    setTimeout(() => {
+                        statusDiv.style.display = 'none';
+                    }, 5000);
+                } else {
+                    throw new Error(result.message || '推送失败');
+                }
+            } catch (error) {
+                showStatus(`❌ 推送失败: ${error.message}`, 'error');
+            } finally {
+                buttonElement.disabled = false;
+                buttonElement.innerHTML = originalHTML;
+            }
+        }
+
+        // 按钮点击事件
+        mathBtn.addEventListener('click', () => push('math', mathBtn));
+        dsBtn.addEventListener('click', () => push('ds', dsBtn));
+
+        // 快捷键支持
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === '1') {
+                    e.preventDefault();
+                    mathBtn.click();
+                } else if (e.key === '2') {
+                    e.preventDefault();
+                    dsBtn.click();
+                } else if (e.key === 'k' || e.key === 'K') {
+                    e.preventDefault();
+                    if (confirm('确定要清空输入内容吗？')) {
+                        contentInput.value = '';
+                        charCount.textContent = '0';
+                        showStatus('✅ 内容已清空', 'info');
+                        setTimeout(() => {
+                            statusDiv.style.display = 'none';
+                        }, 2000);
+                    }
+                } else if (e.key === 'r' || e.key === 'R') {
+                    e.preventDefault();
+                    loadStats('math');
+                    loadStats('ds');
+                    showStatus('🔄 统计数据已刷新', 'info');
+                    setTimeout(() => {
+                        statusDiv.style.display = 'none';
+                    }, 2000);
+                }
+            }
+        });
+
+        // 页面加载时获取统计信息
+        window.addEventListener('load', () => {
+            loadStats('math');
+            loadStats('ds');
+        });
+
+        // 自动聚焦到输入框
+        contentInput.focus();
+    </script>
+</body>
+</html>
