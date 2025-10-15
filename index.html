@@ -53,40 +53,6 @@
             padding: 40px;
         }
         
-        .intro {
-            background: linear-gradient(135deg, #f0f7ff 0%, #e8f4ff 100%);
-            border-left: 4px solid #667eea;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-        
-        .intro h3 {
-            color: #667eea;
-            margin-bottom: 12px;
-            font-size: 18px;
-            font-weight: 600;
-        }
-        
-        .intro ul {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .intro li {
-            padding: 8px 0;
-            color: #555;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-        
-        .intro li::before {
-            content: '✓ ';
-            color: #667eea;
-            font-weight: bold;
-            margin-right: 8px;
-        }
-        
         .text-area-wrapper {
             position: relative;
         }
@@ -249,31 +215,6 @@
             to { transform: rotate(360deg); }
         }
         
-        .shortcuts {
-            background: linear-gradient(135deg, #fff3cd 0%, #ffe9a6 100%);
-            border: 1px solid #ffeeba;
-            border-radius: 10px;
-            padding: 18px;
-            margin-top: 25px;
-            font-size: 13px;
-            color: #856404;
-        }
-        
-        .shortcuts strong {
-            display: block;
-            margin-bottom: 10px;
-            font-size: 15px;
-        }
-        
-        .shortcuts code {
-            background: #fff;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-family: 'Consolas', monospace;
-            font-weight: 600;
-            border: 1px solid #ffeeba;
-        }
-        
         .file-info {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -299,17 +240,6 @@
             margin-bottom: 12px;
             font-size: 17px;
             font-weight: 600;
-        }
-        
-        .file-card .filename {
-            font-family: 'Consolas', monospace;
-            color: #667eea;
-            font-size: 13px;
-            margin-bottom: 18px;
-            padding: 10px;
-            background: white;
-            border-radius: 6px;
-            border: 1px solid #e0e0e0;
         }
         
         .file-card .stats {
@@ -396,38 +326,10 @@
         </div>
 
         <div class="content">
-            <div class="intro">
-                <h3>🎯 功能特点</h3>
-                <ul>
-                    <li>直接粘贴错题内容,系统自动分配连续题号</li>
-                    <li>每道题都有唯一编号（#1, #2, #3...）和精确时间戳</li>
-                    <li>实时显示各科目题目数量和下一题号</li>
-                    <li>支持 Markdown 格式、数学公式、代码块</li>
-                    <li>快捷键操作，提升录入效率</li>
-                </ul>
-            </div>
-
             <div class="text-area-wrapper">
-                <textarea 
-                    id="content" 
-                    placeholder="📝 在这里粘贴你的错题内容...
-
-可以是任意格式：
-
-# 题目
-求极限 lim(x→0) sin(x)/x
-
-# 解析
-这是第一个重要极限，答案是 1
-
-$$\lim_{x \to 0} \frac{\sin x}{x} = 1$$
-
-# 笔记
-记住这个结论！
-
----
-
-或者直接粘贴纯文本也可以！系统会自动添加题号和时间。"></textarea>
+                <textarea
+                    id="content"
+                    placeholder="📝 粘贴错题内容..."></textarea>
             </div>
             
             <div class="char-count">
@@ -446,7 +348,6 @@ $$\lim_{x \to 0} \frac{\sin x}{x} = 1$$
             <div class="file-info">
                 <div class="file-card">
                     <h4>📐 数学错题本</h4>
-                    <div class="filename">数学错题本.md</div>
                     <div class="stats">
                         <div class="stat-item">
                             <span class="stat-value" id="mathCount">-</span>
@@ -461,7 +362,6 @@ $$\lim_{x \to 0} \frac{\sin x}{x} = 1$$
                 </div>
                 <div class="file-card">
                     <h4>💻 数据结构错题本</h4>
-                    <div class="filename">数据结构错题本.md</div>
                     <div class="stats">
                         <div class="stat-item">
                             <span class="stat-value" id="dsCount">-</span>
@@ -477,14 +377,6 @@ $$\lim_{x \to 0} \frac{\sin x}{x} = 1$$
             </div>
 
             <div id="status"></div>
-
-            <div class="shortcuts">
-                <strong>⌨️ 快捷键指南</strong>
-                <code>Ctrl + 1</code> 推送到数学错题本 |
-                <code>Ctrl + 2</code> 推送到数据结构错题本 |
-                <code>Ctrl + K</code> 清空输入内容 |
-                <code>Ctrl + R</code> 刷新统计数据
-            </div>
         </div>
     </div>
 
